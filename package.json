@@ -1,0 +1,13 @@
+{
+  "name": "guilherme-augusto-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfólio estático de Guilherme Augusto",
+  "scripts": {
+    "format": "prettier --write \"*.html\" \"*.css\" README.md",
+    "format:check": "prettier --check \"*.html\" \"*.css\" README.md"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10"
+  }
+}
