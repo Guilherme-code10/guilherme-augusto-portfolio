@@ -1,33 +1,50 @@
-# Guilherme Augusto | Portfólio Web
+# Guilherme Augusto | Desenvolvimento Web
 
-Portfólio pessoal de **Guilherme Augusto**, com projetos, serviços de desenvolvimento web e contato para novos orçamentos.
+Portfólio profissional de Guilherme Augusto, com projetos, páginas de serviços e formas de contato para solicitar orçamentos.
 
-## Tecnologias
+## Páginas
 
-- HTML5, CSS3 e JavaScript
-- Layout responsivo
-- Hospedagem estática: Cloudflare Pages (a configurar)
+- `index.html` — apresentação, trabalhos, demonstrações e formulário de contato via WhatsApp.
+- `sites-profissionais.html` — sites institucionais e landing pages.
+- `lojas-virtuais.html` — catálogo e e-commerce.
+- `manutencao-de-sites.html` — manutenção, atualizações e melhorias.
+- `servicos.css` — estilos compartilhados entre as três páginas de serviços.
 
-## Estrutura
+## Desenvolvimento e formatação
 
-- `index.html`: página, estilos e interatividade
-- `_headers`: cabeçalhos HTTP para hospedagem compatível
-- `robots.txt`: instruções para mecanismos de busca
+O projeto usa HTML, CSS e JavaScript, sem build para publicação.
 
-## Desenvolvimento local
+Para baixar a primeira vez:
 
-Abra `index.html` no navegador ou use a extensão **Live Server** do VS Code.
+```bash
+git clone https://github.com/Guilherme-code10/guilherme-augusto-portfolio.git
+cd guilherme-augusto-portfolio
+npm install
+```
 
-## Publicação contínua
+Para receber atualizações:
 
-Na Cloudflare Pages, escolha a integração **GitHub**, selecione o repositório `Guilherme-code10/guilherme-augusto-portfolio`, a branch `main` e publicação estática sem comando de build. A cada push para `main`, a Cloudflare poderá publicar uma nova versão automaticamente.
+```bash
+git pull origin main
+```
 
-> O site ainda precisa ser conectado a uma hospedagem para ter um link público. O endereço `127.0.0.1` funciona apenas na própria máquina.
+Para formatar com **Prettier**:
 
-## Projetos
+```bash
+npm run format
+```
 
-Os exemplos presentes no portfólio incluem projetos pessoais e acadêmicos. Demonstrações visuais estão identificadas como ilustrativas.
+Ou confira a formatação com `npm run format:check`. O arquivo `.prettierrc.json` padroniza o estilo e `.vscode/settings.json` ativa a formatação ao salvar se a extensão Prettier estiver instalada. O GitHub Actions também executa a formatação após alterações enviadas à `main`.
 
-## Contato
+## Publicação
 
-Pelo formulário de orçamento e links de contato presentes no próprio site.
+O GitHub Pages publica a branch `main` diretamente da raiz do repositório:
+
+https://guilherme-code10.github.io/guilherme-augusto-portfolio/
+
+As páginas de serviços ficam no mesmo endereço, com seus respectivos nomes de arquivo.
+
+## Observações
+
+Os projetos pessoais ou acadêmicos e as prévias conceituais são identificados para não confundir demonstrações com serviços já prestados a clientes. A disponibilidade, o escopo e os custos de cada serviço são definidos em orçamento.
+
