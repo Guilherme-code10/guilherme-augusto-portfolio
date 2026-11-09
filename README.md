@@ -47,4 +47,3 @@ As páginas de serviços ficam no mesmo endereço, com seus respectivos nomes de
 ## Observações
 
 Os projetos pessoais ou acadêmicos e as prévias conceituais são identificados para não confundir demonstrações com serviços já prestados a clientes. A disponibilidade, o escopo e os custos de cada serviço são definidos em orçamento.
-
