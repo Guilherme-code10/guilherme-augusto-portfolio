@@ -5,6 +5,7 @@ Portfólio profissional de Guilherme Augusto, com projetos, páginas de serviço
 ## Páginas
 
 - `index.html` — apresentação, trabalhos, demonstrações e formulário de contato via WhatsApp.
+- `styles.css` — estilos da página inicial, incluindo responsividade e animações visuais.
 - `sites-profissionais.html` — sites institucionais e landing pages.
 - `lojas-virtuais.html` — catálogo e e-commerce.
 - `manutencao-de-sites.html` — manutenção, atualizações e melhorias.
