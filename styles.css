@@ -3268,3 +3268,15 @@ body {
 .bar-chart .bar-height-90 {
   height: 90%;
 }
+
+/* Prévia ilustrativa do Brbeauty, sem dados de clientes. */
+.brbeauty-art { background: linear-gradient(135deg, #f5d4e1, #fff0f5); display: flex; align-items: center; justify-content: center; padding: 34px 24px 50px; }
+.brbeauty-preview { width: min(100%, 330px); padding: 23px; border: 1px solid #edcedb; border-radius: 20px; background: #fffbfc; color: #52243b; box-shadow: 0 16px 40px #82355118; }
+.brbeauty-preview-brand { font: 28px Georgia, serif; color: #923e60; display: flex; justify-content: space-between; }
+.brbeauty-preview > small { display: block; font-size: 8px; letter-spacing: 1.5px; color: #80606f; margin: 7px 0 17px; }
+.brbeauty-preview > strong { display: block; font: italic 21px Georgia, serif; margin-bottom: 16px; }
+.brbeauty-preview-row { display: flex; align-items: center; gap: 9px; background: #fceef4; border-radius: 10px; margin-top: 8px; padding: 11px 9px; font-size: 10px; }
+.brbeauty-preview-row > span { color: #a64f65; font-size: 16px; }
+.brbeauty-preview-row > i { margin-left: auto; font-size: 8px; font-style: normal; color: #7b3450; }
+.brbeauty-preview-nav { font-size: 8px; text-align: center; margin-top: 18px; color: #80606f; }
+.brbeauty-art .art-type { background: #863b59; color: #fff; }
