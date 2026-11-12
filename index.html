@@ -183,7 +183,7 @@
         </div>
         <div aria-label="Filtrar projetos" class="filters" role="group">
           <button aria-pressed="true" class="filter is-active" data-filter="todos" type="button">
-            Todos <span>06</span>
+            Todos <span>07</span>
           </button>
           <button aria-pressed="false" class="filter" data-filter="aplicacoes" type="button">
             Aplicações
@@ -491,6 +491,30 @@
             >
               Explorar projeto ↗
             </button>
+          </article>
+          <article class="project-card reveal" data-category="aplicacoes" data-project="brbeauty">
+            <div class="project-art brbeauty-art" aria-hidden="true">
+              <div class="brbeauty-preview">
+                <div class="brbeauty-preview-brand">Brbeauty <span>♡</span></div>
+                <small>CRIE, ORGANIZE, FLORESÇA</small>
+                <strong>Uma rotina mais leve.</strong>
+                <div class="brbeauty-preview-row"><span>○</span> Criar conteúdo <i>Hoje</i></div>
+                <div class="brbeauty-preview-row"><span>✓</span> Organizar a semana <i>Concluído</i></div>
+                <div class="brbeauty-preview-nav">Meu dia · Clientes · Produção · Histórico</div>
+              </div>
+              <span class="art-type">ORGANIZAÇÃO &amp; PRODUTIVIDADE</span>
+            </div>
+            <div class="project-details">
+              <div>
+                <div class="project-number">07 / APLICAÇÃO WEB</div>
+                <h3>Brbeauty</h3>
+                <p>Organizador de clientes e tarefas para produção de conteúdo, com prazos, etapas e histórico de entregas.</p>
+                <div class="tags"><span>JavaScript</span><span>CSS</span><span>Cloudflare Pages</span></div>
+                <a class="demo-inline" href="https://rotina-da-rafa.pages.dev" rel="noopener noreferrer" target="_blank">Ver site publicado ↗</a>
+              </div>
+              <a aria-label="Ver o código do Brbeauty no GitHub" class="project-link" href="https://github.com/Guilherme-code10/rotina-da-rafa" rel="noopener noreferrer" target="_blank">↗</a>
+            </div>
+            <button aria-haspopup="dialog" class="project-explore" data-project="brbeauty" type="button">Explorar projeto ↗</button>
           </article>
         </div>
         <a
@@ -1028,6 +1052,15 @@
         "use strict";
         // Project modal: keeps GitHub links independent of cards.
         const projects = {
+          brbeauty: {
+            title: "Brbeauty",
+            kind: "Aplicação web",
+            description: "Organizador de rotina para profissionais de conteúdo, com identidade visual rosa e interface adaptada para celular, tablet e computador.",
+            highlights: "Quatro telas: Meu dia, Clientes, Produção e Histórico. Várias tarefas por cliente, prazos, prioridades e backup. Dados salvos no navegador, sem sincronização entre aparelhos.",
+            tech: "HTML semântico · CSS responsivo · JavaScript · localStorage · Cloudflare Pages",
+            repo: "https://github.com/Guilherme-code10/rotina-da-rafa",
+            demo: "https://rotina-da-rafa.pages.dev",
+          },
           financeiro: {
             title: "Meu Financeiro",
             kind: "Aplicação web",
