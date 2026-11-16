@@ -8,7 +8,7 @@ function valid(s){return s&&(s.quick===undefined||(Array.isArray(s.quick)&&s.qui
 function validEvent(e){return e&&typeof e.id==='string'&&typeof e.title==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(e.start)&&/^([01]\d|2[0-3]):[0-5]\d$/.test(e.end)}
 try{const raw=localStorage.getItem(KEY);if(raw){const x=JSON.parse(raw);if(!valid(x))throw Error();state=x}}catch(e){storageOK=false}
 function notice(t){$('toast').textContent=t;$('toast').hidden=false;setTimeout(()=>$('toast').hidden=true,4500)}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));storageOK=true}catch(e){storageOK=false}status();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));storageOK=true}catch(e){storageOK=false}status();window.MeuDiaCloud?.localChanged?.();}
 function status(){$('status').textContent=storageOK?'Salvo automaticamente neste navegador. Use backup para guardar uma cópia.':'Não foi possível salvar no navegador. Baixe um backup antes de fechar.'}
 function snapshot(d){if(!state.days[d])state.days[d]={notes:'',done:{},events:clone(state.templates[weekday(d)])};return state.days[d]}
 function get(d){return state.days[d]||{notes:'',done:{},events:state.templates[weekday(d)]}}
@@ -32,4 +32,15 @@ $('backup').onclick=()=>download('meu-dia-backup-'+todayKey()+'.json',JSON.strin
 function escICS(s){return s.replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/;/g,'\\;').replace(/,/g,'\\,')}
 function fold(s){let lines=[],line='',n=0;for(const c of s){const len=new TextEncoder().encode(c).length;if(n+len>73){lines.push(line);line=' ';n=1}line+=c;n+=len}lines.push(line);return lines.join('\r\n')}
 $('ics').onclick=()=>{const monday=shift(selected,-weekday(selected)),lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Gui//Meu Dia//PT-BR','CALSCALE:GREGORIAN','BEGIN:VTIMEZONE','TZID:America/Sao_Paulo','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:-0300','TZOFFSETTO:-0300','TZNAME:-03','END:STANDARD','END:VTIMEZONE'];for(let i=0;i<7;i++){const d=shift(monday,i);for(const e of events(d)){const end=e.end<=e.start?shift(d,1):d;lines.push('BEGIN:VEVENT','UID:'+d+'-'+e.id+'@gui-meudia.local','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z/,'Z'),'DTSTART;TZID=America/Sao_Paulo:'+d.replace(/-/g,'')+'T'+e.start.replace(':','')+'00','DTEND;TZID=America/Sao_Paulo:'+end.replace(/-/g,'')+'T'+e.end.replace(':','')+'00','SUMMARY:'+escICS(e.title),'END:VEVENT')}}lines.push('END:VCALENDAR');download('rotina-semana-'+monday+'.ics',lines.map(fold).join('\r\n')+'\r\n','text/calendar;charset=utf-8');notice('Semana exportada. Este arquivo não sincroniza alterações.')};
+window.MeuDiaCloudApp = {
+  read: () => clone(state),
+  seed: () => ({schema:2, templates:clone(SEED), days:{}, quick:[]}),
+  replace: incoming => {
+    if (!valid(incoming)) throw new Error('Estado remoto inválido');
+    state = clone(incoming);
+    try { localStorage.setItem(KEY, JSON.stringify(state)); storageOK = true; }
+    catch { storageOK = false; }
+    render();
+  }
+};
 setInterval(()=>{if(view==='day'&&document.activeElement!==$('notes')&&!$('editor').open)render()},60000);render();
