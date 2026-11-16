@@ -1,0 +1,290 @@
+/* Meu Dia: sincronização opcional, autenticada e isolada.
+   Usa apenas chave publicável; nunca coloque service_role neste arquivo. */
+(() => {
+  'use strict';
+  const config = window.MEU_DIA_CLOUD_CONFIG;
+  const app = window.MeuDiaCloudApp;
+  const root = document.getElementById('cloudPanel');
+  if (!root || !app) return;
+
+  const statusEl = document.getElementById('cloudStatus');
+  const loginForm = document.getElementById('cloudLogin');
+  const signedIn = document.getElementById('cloudSignedIn');
+  const emailDisplay = document.getElementById('cloudEmail');
+  const signUpButton = document.getElementById('cloudSignUp');
+  const signOutButton = document.getElementById('cloudSignOut');
+  const retryButton = document.getElementById('cloudRetry');
+  const SYNC_KEY = 'meu-dia-nuvem-v1';
+  const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const copy = value => JSON.parse(JSON.stringify(value));
+  const object = value => !!value && typeof value === 'object' && !Array.isArray(value);
+  const own = (value, key) => Object.prototype.hasOwnProperty.call(value || {}, key);
+  const readMeta = () => {
+    try { return JSON.parse(localStorage.getItem(SYNC_KEY) || 'null') || {}; }
+    catch { return {}; }
+  };
+  const saveMeta = value => {
+    try { localStorage.setItem(SYNC_KEY, JSON.stringify(value)); }
+    catch { /* app continua com armazenamento local */ }
+  };
+
+  /* Merge de três vias: preserva mudanças locais em campos distintos
+     e também mudanças que chegaram de outro aparelho. Em conflito no
+     mesmo campo, prevalece a edição local ainda não sincronizada. */
+  function merge(base, local, remote) {
+    if (equal(local, base)) return remote;
+    if (equal(remote, base)) return local;
+    if (equal(local, remote)) return local;
+    if (object(local) && object(remote)) {
+      const out = {};
+      const keys = new Set([...Object.keys(base || {}), ...Object.keys(local), ...Object.keys(remote)]);
+      for (const key of keys) {
+        const value = merge(base?.[key], local[key], remote[key]);
+        if (value !== undefined) out[key] = value;
+      }
+      return out;
+    }
+    if (Array.isArray(local) && Array.isArray(remote)) {
+      if (local.every(item => object(item) && typeof item.id === 'string')
+          && remote.every(item => object(item) && typeof item.id === 'string')) {
+        const byId = list => new Map(list.map(item => [item.id, item]));
+        const old = byId(Array.isArray(base) ? base : []);
+        const mine = byId(local), theirs = byId(remote);
+        const ids = new Set([...old.keys(), ...mine.keys(), ...theirs.keys()]);
+        return [...ids].map(id => merge(old.get(id), mine.get(id), theirs.get(id)))
+          .filter(item => item !== undefined);
+      }
+      if (local.length === remote.length && local.length === (base?.length || 0))
+        return local.map((item, index) => merge(base[index], item, remote[index]));
+    }
+    return local;
+  }
+
+  if (!config?.url || !config?.publishableKey || !window.supabase?.createClient) {
+    statusEl.textContent = 'Suas tarefas continuam salvas neste aparelho. Sincronização ainda não ativada.';
+    loginForm.hidden = true;
+    retryButton.hidden = true;
+    return;
+  }
+  const client = window.supabase.createClient(config.url, config.publishableKey, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+  });
+  let user = null, revision = null, baseline = null, pending = false;
+  let changed = 0, syncTimer = null, activeRequest = false, loading = false;
+  let bootSequence = 0, lastOnlineCheck = 0;
+
+  function message(value) { statusEl.textContent = value; }
+  function schedule(delay = 1000) {
+    clearTimeout(syncTimer);
+    if (user) syncTimer = setTimeout(() => void upload(), delay);
+  }
+  function remember() {
+    if (!user || revision === null || !baseline) return;
+    saveMeta({ userId: user.id, revision, baseline, savedAt: Date.now() });
+  }
+  function preserveLocal() {
+    try {
+      const key = 'meu-dia-backup-antes-da-nuvem-' + new Date().toISOString().slice(0, 10);
+      if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify(app.read()));
+    } catch { /* os dados principais permanecem no armazenamento original */ }
+  }
+  async function remoteRow() {
+    const { data, error } = await client.from('meu_dia_estados')
+      .select('revision,payload,updated_at').eq('user_id', user.id).maybeSingle();
+    if (error) throw error;
+    return data;
+  }
+
+  async function begin(account) {
+    const seq = ++bootSequence;
+    loading = true;
+    clearTimeout(syncTimer);
+    user = account;
+    revision = null;
+    baseline = null;
+    loginForm.hidden = true;
+    signedIn.hidden = false;
+    emailDisplay.textContent = account.email || 'Conta conectada';
+    message('Conectando os aparelhos...');
+    try {
+      const remote = await remoteRow();
+      if (seq !== bootSequence) return;
+      const meta = readMeta();
+      const local = app.read();
+      const sameAccount = !meta.userId || meta.userId === account.id;
+      const oldBase = sameAccount && meta.baseline ? meta.baseline : app.seed();
+      if (!remote) {
+        if (!sameAccount) {
+          preserveLocal();
+          app.replace(app.seed());
+        }
+        const payload = app.read();
+        const { data, error } = await client.from('meu_dia_estados')
+          .insert({ user_id: account.id, payload, revision: 1 })
+          .select('revision,payload').single();
+        if (error) {
+          if (error.code !== '23505') throw error;
+          await begin(account);
+          return;
+        }
+        revision = data.revision;
+        baseline = copy(data.payload);
+      } else {
+        revision = Number(remote.revision);
+        baseline = copy(remote.payload);
+        const combined = sameAccount ? merge(oldBase, local, remote.payload) : remote.payload;
+        if (!equal(local, combined)) preserveLocal();
+        app.replace(combined);
+        if (!equal(combined, remote.payload)) {
+          pending = true;
+          changed++;
+        }
+      }
+      remember();
+      message(pending ? 'Salvo neste aparelho; enviando alterações...' : 'Sincronizado ✓ · celular e computador');
+    } catch (error) {
+      message('Sem conexão com a nuvem. Seus dados continuam neste aparelho. ' + (error.message || ''));
+      pending = true;
+    } finally {
+      if (seq === bootSequence) {
+        loading = false;
+        if (pending) schedule(150);
+      }
+    }
+  }
+
+  async function upload() {
+    if (!user || loading || activeRequest || !navigator.onLine) return;
+    if (!pending) return;
+    if (revision === null || !baseline) return void refresh();
+    activeRequest = true;
+    const generation = changed;
+    const snapshot = copy(app.read());
+    try {
+      const { data, error } = await client.from('meu_dia_estados')
+        .update({ payload: snapshot, revision: revision + 1, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id).eq('revision', revision)
+        .select('revision,payload').maybeSingle();
+      if (error) throw error;
+      if (!data) {
+        const latest = await remoteRow();
+        if (!latest) throw new Error('Estado remoto não encontrado');
+        const combined = merge(baseline, app.read(), latest.payload);
+        revision = Number(latest.revision);
+        baseline = copy(latest.payload);
+        app.replace(combined);
+        pending = true;
+        changed++;
+        remember();
+        message('Conciliando edições feitas em outro aparelho...');
+      } else {
+        revision = Number(data.revision);
+        baseline = snapshot;
+        pending = changed !== generation;
+        remember();
+        message(pending ? 'Enviando últimas alterações...' : 'Sincronizado ✓ · celular e computador');
+      }
+    } catch (error) {
+      pending = true;
+      message('Alterações salvas no aparelho. A nuvem será tentada novamente. ' + (error.message || ''));
+    } finally {
+      activeRequest = false;
+      if (pending) schedule(3200);
+    }
+  }
+
+  async function refresh() {
+    if (!user || loading || activeRequest || !navigator.onLine) return;
+    activeRequest = true;
+    try {
+      const remote = await remoteRow();
+      if (!remote) throw new Error('Nenhum estado remoto foi encontrado');
+      if (revision !== Number(remote.revision)) {
+        const combined = pending ? merge(baseline || app.seed(), app.read(), remote.payload) : remote.payload;
+        revision = Number(remote.revision);
+        baseline = copy(remote.payload);
+        app.replace(combined);
+        if (pending && !equal(combined, remote.payload)) changed++;
+        else pending = false;
+        remember();
+      }
+      if (!pending) message('Sincronizado ✓ · celular e computador');
+    } catch (error) {
+      message('Modo local · conexão indisponível. As alterações serão reenviadas.');
+    } finally {
+      activeRequest = false;
+      if (pending) schedule(1000);
+    }
+  }
+
+  window.MeuDiaCloud = {
+    localChanged() {
+      if (!user || loading) return;
+      changed++;
+      pending = true;
+      message('Salvo neste aparelho; sincronizando...');
+      schedule();
+    },
+  };
+  loginForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    const email = document.getElementById('cloudLoginEmail').value.trim();
+    const password = document.getElementById('cloudLoginPassword').value;
+    message('Entrando com segurança...');
+    const { error } = await client.auth.signInWithPassword({ email, password });
+    if (error) message('Não foi possível entrar: ' + error.message);
+    document.getElementById('cloudLoginPassword').value = '';
+  });
+  signUpButton.addEventListener('click', async () => {
+    const email = document.getElementById('cloudLoginEmail').value.trim();
+    const password = document.getElementById('cloudLoginPassword').value;
+    if (!email || password.length < 8) {
+      message('Informe e-mail e senha com pelo menos 8 caracteres.');
+      return;
+    }
+    message('Criando conta...');
+    const { data, error } = await client.auth.signUp({ email, password, options: {
+      emailRedirectTo: window.location.origin + window.location.pathname,
+    }});
+    if (error) message('Não foi possível cadastrar: ' + error.message);
+    else if (!data.session) message('Conta criada. Confira seu e-mail para confirmar o cadastro e depois entre.');
+    else message('Conta criada. Conectando...');
+    document.getElementById('cloudLoginPassword').value = '';
+  });
+  signOutButton.addEventListener('click', () => void client.auth.signOut());
+  retryButton.addEventListener('click', () => void (pending ? upload() : refresh()));
+  client.auth.onAuthStateChange((_event, session) => {
+    setTimeout(() => {
+      if (session?.user) {
+        if (user?.id !== session.user.id) void begin(session.user);
+      } else {
+        ++bootSequence;
+        user = null;
+        revision = null;
+        baseline = null;
+        clearTimeout(syncTimer);
+        loginForm.hidden = false;
+        signedIn.hidden = true;
+        message('Entre com a mesma conta nos dois aparelhos. Seus dados locais permanecem aqui.');
+      }
+    }, 0);
+  });
+  client.auth.getUser().then(({ data, error }) => {
+    if (error || !data.user) {
+      message('Entre com a mesma conta no celular e no PC para sincronizar.');
+      loginForm.hidden = false;
+    } else if (!user) void begin(data.user);
+  }).catch(() => {
+    message('Sem conexão com o serviço de login. O modo local continua funcionando.');
+  });
+  setInterval(() => {
+    if (document.visibilityState !== 'visible' || !navigator.onLine || !user) return;
+    if (Date.now() - lastOnlineCheck < 10000) return;
+    lastOnlineCheck = Date.now();
+    void (pending ? upload() : refresh());
+  }, 12000);
+  window.addEventListener('online', () => void (pending ? upload() : refresh()));
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') void (pending ? upload() : refresh());
+  });
+})();
