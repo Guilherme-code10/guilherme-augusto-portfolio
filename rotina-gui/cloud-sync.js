@@ -67,9 +67,11 @@
   }
 
   if (!config?.url || !config?.publishableKey || !window.supabase?.createClient) {
-    message('Suas tarefas continuam salvas neste aparelho. Sincronização ainda não ativada.');
+    const problem = 'A conexão online não carregou. Atualize esta página. Suas tarefas permanecem salvas neste aparelho.';
+    statusEl.textContent = problem;
+    const indicator = document.getElementById('cloudIndicator');
+    if (indicator) indicator.textContent = problem;
     loginForm.hidden = true;
-    retryButton.hidden = true;
     return;
   }
   const client = window.supabase.createClient(config.url, config.publishableKey, {
