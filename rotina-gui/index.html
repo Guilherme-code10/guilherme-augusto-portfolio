@@ -5,8 +5,10 @@
 <form id="cloudLogin" class="cloud-login" hidden>
 <label for="cloudLoginEmail">E-mail</label><input id="cloudLoginEmail" type="email" autocomplete="email" inputmode="email" required>
 <label for="cloudLoginPassword">Senha</label><input id="cloudLoginPassword" type="password" autocomplete="current-password" required><p class="muted">Use uma senha exclusiva com pelo menos 8 caracteres. Se já criou a conta, confirme o e-mail recebido antes de entrar.</p>
-<div class="row"><button class="primary" type="submit">Entrar e sincronizar</button><button id="cloudSignUp" type="button">Criar conta</button></div><button id="cloudResendEmail" type="button">Reenviar e-mail de confirmação</button>
+<div class="row"><button class="primary" type="submit">Entrar e sincronizar</button><button id="cloudSignUp" type="button">Criar conta</button></div><div class="row cloud-auth-tools"><button id="cloudForgot" type="button">Esqueci minha senha</button><button id="cloudTogglePassword" type="button" aria-pressed="false">Mostrar senha</button></div>
+<button id="cloudResendEmail" type="button">Reenviar e-mail de confirmação</button>
 </form>
+<section id="cloudRecovery" class="cloud-recovery" hidden aria-labelledby="cloudRecoveryHeading"><h3 id="cloudRecoveryHeading">Criar uma nova senha</h3><p class="muted">Você abriu o link de recuperação. Digite sua nova senha para continuar usando o Meu Dia no celular e no PC.</p><form id="cloudRecoveryForm"><label for="cloudNewPassword">Nova senha</label><input id="cloudNewPassword" type="password" autocomplete="new-password" minlength="8" required><button class="primary" type="submit">Salvar nova senha</button></form></section>
 <div id="cloudSignedIn" hidden><p>Conta: <strong id="cloudEmail"></strong></p>
 <div class="row"><button id="cloudRetry" type="button">Sincronizar agora</button><button id="cloudSignOut" type="button">Sair da conta</button></div></div>
 <p class="muted">Se ficar sem internet, continue normalmente: as alterações locais serão enviadas quando a conexão voltar. Antes da primeira conexão, faça um backup dos dados deste aparelho. A sincronização não substitui a necessidade de backup; conecte seus aparelhos com a mesma conta.</p>

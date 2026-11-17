@@ -13,6 +13,11 @@
   const emailDisplay = document.getElementById('cloudEmail');
   const signUpButton = document.getElementById('cloudSignUp');
   const resendEmailButton = document.getElementById('cloudResendEmail');
+  const forgotButton = document.getElementById('cloudForgot');
+  const togglePasswordButton = document.getElementById('cloudTogglePassword');
+  const recoverySection = document.getElementById('cloudRecovery');
+  const recoveryForm = document.getElementById('cloudRecoveryForm');
+  const newPassword = document.getElementById('cloudNewPassword');
   const signOutButton = document.getElementById('cloudSignOut');
   const retryButton = document.getElementById('cloudRetry');
   const SYNC_KEY = 'meu-dia-nuvem-v1';
@@ -255,6 +260,48 @@
     else message('Conta criada. Conectando...');
     document.getElementById('cloudLoginPassword').value = '';
   });
+  togglePasswordButton.addEventListener('click', () => {
+    const input = document.getElementById('cloudLoginPassword');
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    togglePasswordButton.textContent = show ? 'Ocultar senha' : 'Mostrar senha';
+    togglePasswordButton.setAttribute('aria-pressed', String(show));
+  });
+
+  forgotButton.addEventListener('click', async () => {
+    const email = document.getElementById('cloudLoginEmail').value.trim();
+    if (!email) { message('Informe seu e-mail para recuperar o acesso.'); return; }
+    forgotButton.disabled = true;
+    message('Solicitando o link para definir uma nova senha...');
+    try {
+      const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + window.location.pathname,
+      });
+      message(error
+        ? 'Não foi possível solicitar a recuperação: ' + error.message
+        : 'Se esse e-mail estiver cadastrado, você receberá um link para trocar a senha. Confira o Gmail e o Spam.');
+    } catch {
+      message('Sem conexão para solicitar a recuperação. Tente novamente.');
+    } finally { forgotButton.disabled = false; }
+  });
+
+  recoveryForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (newPassword.value.length < 8) {
+      message('Sua nova senha precisa ter pelo menos 8 caracteres.');
+      return;
+    }
+    message('Atualizando sua senha...');
+    const { error } = await client.auth.updateUser({ password: newPassword.value });
+    newPassword.value = '';
+    if (error) message('Não foi possível atualizar a senha: ' + error.message);
+    else {
+      recoverySection.hidden = true;
+      message('Senha atualizada. Conta conectada; suas tarefas serão sincronizadas automaticamente.');
+      if (user) void (pending ? upload() : refresh());
+    }
+  });
+
   resendEmailButton.addEventListener('click', async () => {
     const email = document.getElementById('cloudLoginEmail').value.trim();
     if (!email) { message('Preencha o e-mail cadastrado para reenviar a confirmação.'); return; }
@@ -279,6 +326,12 @@
   retryButton.addEventListener('click', () => void (pending ? upload() : refresh()));
   client.auth.onAuthStateChange((_event, session) => {
     setTimeout(() => {
+      if (_event === 'PASSWORD_RECOVERY') {
+        recoverySection.hidden = false;
+        document.querySelector('nav button[data-view="settings"]')?.click();
+        recoverySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        message('Defina uma nova senha para finalizar a recuperação de acesso.');
+      }
       if (session?.user) {
         if (user?.id !== session.user.id) void begin(session.user);
       } else {

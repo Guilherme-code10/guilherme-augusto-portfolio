@@ -34,3 +34,10 @@ main{margin-left:230px;padding:35px;max-width:1550px}h1{font-family:Impact,'Aria
 .cloud-quick-access .cloud-indicator{flex:1;min-width:185px;margin:0;padding:0;background:transparent;border:none}
 .cloud-quick-access button{white-space:normal;min-height:42px}
 @media(max-width:650px){.cloud-quick-access{align-items:stretch;flex-direction:column}.cloud-quick-access button{width:100%}}
+
+/* Acesso no celular: recuperação de senha e controles de visibilidade. */
+#cloudPanel .cloud-auth-tools{gap:8px;margin:5px 0}
+#cloudPanel .cloud-auth-tools button{font-size:.9rem}
+#cloudPanel .cloud-recovery{padding:16px;margin:14px 0;border:1px solid #bbcee9;border-radius:12px;background:#fff}
+#cloudPanel .cloud-recovery form{display:grid;gap:9px;max-width:460px}
+#cloudPanel .cloud-recovery[hidden]{display:none!important}
