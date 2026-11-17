@@ -47,3 +47,10 @@ main{margin-left:230px;padding:35px;max-width:1550px}h1{font-family:Impact,'Aria
 #cloudPanel .cloud-link-login button{width:100%;min-height:44px}
 #cloudPanel .cloud-link-login .muted{margin:8px 0 0}
 #cloudPanel .cloud-link-login button:disabled{opacity:.65;cursor:wait}
+
+/* Alteração de senha em sessão autenticada, sem e-mail adicional. */
+#cloudPasswordChange{margin:16px 0;padding:16px;border:1px solid #ccd9ee;background:#fff;border-radius:12px}
+#cloudPasswordChange form{display:grid;gap:10px;max-width:490px}
+#cloudPasswordChange input{min-height:44px}
+#cloudPasswordChange .row{align-items:center}
+#cloudPasswordChange[hidden]{display:none!important}

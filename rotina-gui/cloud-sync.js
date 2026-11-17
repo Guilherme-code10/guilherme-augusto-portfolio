@@ -20,6 +20,12 @@
   const newPassword = document.getElementById('cloudNewPassword');
   const signOutButton = document.getElementById('cloudSignOut');
   const retryButton = document.getElementById('cloudRetry');
+  const showChangePassword = document.getElementById('cloudShowPasswordChange');
+  const changePasswordPanel = document.getElementById('cloudPasswordChange');
+  const changePasswordForm = document.getElementById('cloudPasswordForm');
+  const accountNewPassword = document.getElementById('cloudAccountNewPassword');
+  const accountConfirmPassword = document.getElementById('cloudAccountConfirmPassword');
+  const cancelChangePassword = document.getElementById('cloudCancelPasswordChange');
   const SYNC_KEY = 'meu-dia-nuvem-v1';
   const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   const copy = value => JSON.parse(JSON.stringify(value));
@@ -246,7 +252,7 @@
     if (error) {
       const code = error.code || '';
       if (code === 'invalid_credentials' || error.message === 'Invalid login credentials')
-        message('Senha incorreta para esta conta. Use "Esqueci minha senha" ou "Entrar sem senha" abaixo.');
+        message('Senha não reconhecida. Se você já entrou no PC, pode alterar a senha lá em "Minha conta e sincronização" → "Alterar minha senha", sem pedir outro e-mail.');
       else if (code === 'email_not_confirmed' || error.message === 'Email not confirmed')
         message('Esta conta precisa validar o e-mail antes do primeiro acesso. Confira o e-mail de cadastro.');
       else message('Não foi possível entrar: ' + error.message);
@@ -328,13 +334,54 @@
           emailRedirectTo: window.location.origin + window.location.pathname,
         },
       });
-      message(error
-        ? 'Não foi possível enviar o link: ' + error.message
-        : 'Link solicitado! Abra o e-mail de acesso no seu celular ou PC. Não é preciso confirmar seu cadastro novamente.');
+      if (error) {
+        if (error.code === 'over_email_send_rate_limit' || /email rate limit exceeded/i.test(error.message || '')) {
+          message('O Supabase atingiu o limite de envio de e-mails. Não tente outro link agora. Use sua senha ou altere a senha no computador onde você já está conectado.');
+        } else message('Não foi possível enviar o link: ' + error.message);
+      } else message('Link solicitado! Abra o e-mail de acesso no seu celular ou PC. Não é preciso confirmar seu cadastro novamente.');
     } catch (error) {
       message('Não foi possível solicitar o link: ' + (error?.message || 'Verifique sua conexão.'));
     } finally {
       magicLinkButton.disabled = false;
+    }
+  });
+  function toggleChangePassword(open) {
+    changePasswordPanel.hidden = !open;
+    showChangePassword.setAttribute('aria-expanded', String(open));
+    if (open) accountNewPassword.focus();
+    else { accountNewPassword.value = ''; accountConfirmPassword.value = ''; }
+  }
+  showChangePassword.addEventListener('click', () => toggleChangePassword(changePasswordPanel.hidden));
+  cancelChangePassword.addEventListener('click', () => toggleChangePassword(false));
+  changePasswordForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!user) { message('Entre na conta antes de alterar a senha.'); return; }
+    const password = accountNewPassword.value;
+    if (password.length < 8) {
+      message('A nova senha precisa ter pelo menos 8 caracteres.');
+      return;
+    }
+    if (accountConfirmPassword.value !== password) {
+      message('As duas senhas não são iguais. Confira e tente novamente.');
+      return;
+    }
+    const submit = changePasswordForm.querySelector('button[type="submit"]');
+    submit.disabled = true;
+    message('Atualizando sua senha de acesso...');
+    try {
+      const { error } = await client.auth.updateUser({ password });
+      if (error) {
+        message('Não foi possível mudar a senha: ' + error.message);
+        return;
+      }
+      toggleChangePassword(false);
+      message('Senha atualizada! Agora entre com a mesma conta e a senha nova no celular. Não precisa confirmar e-mail.');
+    } catch (e) {
+      message('Não foi possível mudar a senha: ' + (e?.message || 'falha de conexão'));
+    } finally {
+      accountNewPassword.value = '';
+      accountConfirmPassword.value = '';
+      submit.disabled = false;
     }
   });
   signOutButton.addEventListener('click', () => void client.auth.signOut());
