@@ -16,3 +16,12 @@ main{margin-left:230px;padding:35px;max-width:1550px}h1{font-family:Impact,'Aria
 /* Identidade do app e acessibilidade */
 .brand{display:flex;flex-direction:column;align-items:flex-start;gap:12px}.brand-icon{display:block;width:58px;height:58px;object-fit:contain}.brand-title{color:#f4f0e5}.bar[role='progressbar']{overflow:hidden}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:700px){.brand{flex-direction:row;align-items:center;gap:12px}.brand-icon{width:44px;height:44px}}
+
+/* Conta opcional e estado de sincronização */
+#cloudPanel{padding:20px;border:1px solid #dbe5f3;border-radius:16px;background:#f8fbff;margin:14px 0 24px}
+#cloudPanel [hidden]{display:none!important}
+#cloudPanel .cloud-login{display:grid;gap:10px;max-width:480px;margin-top:16px}
+#cloudPanel label{font-weight:700;font-size:.9rem}
+#cloudPanel input{width:100%;min-height:44px}
+#cloudPanel .row{flex-wrap:wrap}
+#cloudStatus{margin-block:12px;overflow-wrap:anywhere}
