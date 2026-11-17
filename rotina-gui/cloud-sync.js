@@ -61,7 +61,7 @@
   }
 
   if (!config?.url || !config?.publishableKey || !window.supabase?.createClient) {
-    statusEl.textContent = 'Suas tarefas continuam salvas neste aparelho. Sincronização ainda não ativada.';
+    message('Suas tarefas continuam salvas neste aparelho. Sincronização ainda não ativada.');
     loginForm.hidden = true;
     retryButton.hidden = true;
     return;
@@ -73,7 +73,7 @@
   let changed = 0, syncTimer = null, activeRequest = false, loading = false, failureCount = 0;
   let bootSequence = 0, lastOnlineCheck = 0;
 
-  function message(value) { statusEl.textContent = value; }
+  function message(value) { statusEl.textContent = value; const badge = document.getElementById('cloudIndicator'); if (badge) badge.textContent = value; }
   function schedule(delay = 1000) {
     clearTimeout(syncTimer);
     if (user) syncTimer = setTimeout(() => void upload(), delay);

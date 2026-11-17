@@ -9,7 +9,7 @@ function validEvent(e){return e&&typeof e.id==='string'&&typeof e.title==='strin
 try{const raw=localStorage.getItem(KEY);if(raw){const x=JSON.parse(raw);if(!valid(x))throw Error();state=x}}catch(e){storageOK=false}
 function notice(t){$('toast').textContent=t;$('toast').hidden=false;setTimeout(()=>$('toast').hidden=true,4500)}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));storageOK=true}catch(e){storageOK=false}status();window.MeuDiaCloud?.localChanged?.();}
-function status(){$('status').textContent=storageOK?'Salvo automaticamente neste navegador. Use backup para guardar uma cópia.':'Não foi possível salvar no navegador. Baixe um backup antes de fechar.'}
+function status(){$('status').textContent=storageOK?'Salvo neste aparelho. Confira o status da nuvem acima. Use backup para guardar uma cópia.':'Não foi possível salvar no navegador. Baixe um backup antes de fechar.'}
 function snapshot(d){if(!state.days[d])state.days[d]={notes:'',done:{},events:clone(state.templates[weekday(d)])};return state.days[d]}
 function get(d){return state.days[d]||{notes:'',done:{},events:state.templates[weekday(d)]}}
 function events(d){return [...get(d).events].sort((a,b)=>a.start.localeCompare(b.start))}
