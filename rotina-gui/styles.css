@@ -28,3 +28,9 @@ main{margin-left:230px;padding:35px;max-width:1550px}h1{font-family:Impact,'Aria
 
 /* Indicador de salvamento e sincronização visível em todas as telas. */
 .cloud-indicator{margin:10px 0 14px;padding:10px 14px;background:#f2f6ff;border:1px solid #dce6f8;color:#253f63;border-radius:12px;font-size:.9rem;overflow-wrap:anywhere}
+
+/* Acesso rapido à conta: sempre visivel, inclusive no celular. */
+.cloud-quick-access{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0 16px;padding:10px 14px;background:#f2f6ff;border:1px solid #dce6f8;border-radius:12px}
+.cloud-quick-access .cloud-indicator{flex:1;min-width:185px;margin:0;padding:0;background:transparent;border:none}
+.cloud-quick-access button{white-space:normal;min-height:42px}
+@media(max-width:650px){.cloud-quick-access{align-items:stretch;flex-direction:column}.cloud-quick-access button{width:100%}}

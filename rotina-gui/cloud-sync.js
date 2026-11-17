@@ -73,7 +73,7 @@
   let changed = 0, syncTimer = null, activeRequest = false, loading = false, failureCount = 0;
   let bootSequence = 0, lastOnlineCheck = 0;
 
-  function message(value) { statusEl.textContent = value; const badge = document.getElementById('cloudIndicator'); if (badge) badge.textContent = value; }
+  function message(value) { statusEl.textContent = value; const badge = document.getElementById('cloudIndicator'); if (badge) badge.textContent = value; const button=document.getElementById('cloudConnectButton'); if (button) button.textContent = user ? 'Minha conta e sincronização' : 'Conectar celular e PC'; }
   function schedule(delay = 1000) {
     clearTimeout(syncTimer);
     if (user) syncTimer = setTimeout(() => void upload(), delay);
@@ -250,7 +250,7 @@
       emailRedirectTo: window.location.origin + window.location.pathname,
     }});
     if (error) message('Não foi possível cadastrar: ' + error.message);
-    else if (!data.session) message('Conta criada. Confirme pelo link recebido no e-mail, volte para esta página e entre.');
+    else if (!data.session) message('Cadastro solicitado. Verifique a caixa de entrada e spam para confirmar o e-mail. Depois, volte aqui e entre.');
     else message('Conta criada. Conectando...');
     document.getElementById('cloudLoginPassword').value = '';
   });
@@ -268,13 +268,13 @@
         clearTimeout(syncTimer);
         loginForm.hidden = false;
         signedIn.hidden = true;
-        message('Entre com a mesma conta nos dois aparelhos. Seus dados locais permanecem aqui.');
+        message('Nuvem desconectada · entre com a mesma conta no celular e no PC. As tarefas deste aparelho estão preservadas.');
       }
     }, 0);
   });
   client.auth.getUser().then(({ data, error }) => {
     if (error || !data.user) {
-      message('Entre com a mesma conta no celular e no PC para sincronizar.');
+      message('Nuvem desconectada · crie uma conta ou entre com o mesmo e-mail e senha nos dois aparelhos.');
       loginForm.hidden = false;
     } else if (!user) void begin(data.user);
   }).catch(() => {
