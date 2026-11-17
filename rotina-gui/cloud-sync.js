@@ -12,7 +12,7 @@
   const signedIn = document.getElementById('cloudSignedIn');
   const emailDisplay = document.getElementById('cloudEmail');
   const signUpButton = document.getElementById('cloudSignUp');
-  const resendEmailButton = document.getElementById('cloudResendEmail');
+  const magicLinkButton = document.getElementById('cloudMagicLink');
   const forgotButton = document.getElementById('cloudForgot');
   const togglePasswordButton = document.getElementById('cloudTogglePassword');
   const recoverySection = document.getElementById('cloudRecovery');
@@ -241,7 +241,14 @@
     const password = document.getElementById('cloudLoginPassword').value;
     message('Entrando com segurança...');
     const { error } = await client.auth.signInWithPassword({ email, password });
-    if (error) message(error.message === 'Invalid login credentials' || error.message === 'Email not confirmed' ? 'Ainda não foi possível entrar. Confirme seu e-mail no Gmail e confira sua senha; se precisar, use Reenviar e-mail de confirmação.' : 'Não foi possível entrar: ' + error.message);
+    if (error) {
+      const code = error.code || '';
+      if (code === 'invalid_credentials' || error.message === 'Invalid login credentials')
+        message('Senha incorreta para esta conta. Use "Esqueci minha senha" ou "Entrar sem senha" abaixo.');
+      else if (code === 'email_not_confirmed' || error.message === 'Email not confirmed')
+        message('Esta conta precisa validar o e-mail antes do primeiro acesso. Confira o e-mail de cadastro.');
+      else message('Não foi possível entrar: ' + error.message);
+    }
     document.getElementById('cloudLoginPassword').value = '';
   });
   signUpButton.addEventListener('click', async () => {
@@ -302,24 +309,30 @@
     }
   });
 
-  resendEmailButton.addEventListener('click', async () => {
+  magicLinkButton.addEventListener('click', async () => {
     const email = document.getElementById('cloudLoginEmail').value.trim();
-    if (!email) { message('Preencha o e-mail cadastrado para reenviar a confirmação.'); return; }
-    resendEmailButton.disabled = true;
-    message('Solicitando novo e-mail de confirmação...');
+    if (!email || !document.getElementById('cloudLoginEmail').checkValidity()) {
+      message('Informe um e-mail válido para receber seu link de acesso.');
+      document.getElementById('cloudLoginEmail').focus();
+      return;
+    }
+    magicLinkButton.disabled = true;
+    message('Solicitando seu link de acesso...');
     try {
-      const { error } = await client.auth.resend({
-        type: 'signup',
+      const { error } = await client.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: window.location.origin + window.location.pathname },
+        options: {
+          shouldCreateUser: false,
+          emailRedirectTo: window.location.origin + window.location.pathname,
+        },
       });
       message(error
-        ? 'Não foi possível reenviar: ' + error.message
-        : 'Se o cadastro estiver pendente, enviaremos outro link. Confira seu Gmail e a pasta Spam.');
-    } catch {
-      message('Não foi possível solicitar o e-mail. Confira sua conexão e tente novamente.');
+        ? 'Não foi possível enviar o link: ' + error.message
+        : 'Link solicitado! Abra o e-mail de acesso no seu celular ou PC. Não é preciso confirmar seu cadastro novamente.');
+    } catch (error) {
+      message('Não foi possível solicitar o link: ' + (error?.message || 'Verifique sua conexão.'));
     } finally {
-      resendEmailButton.disabled = false;
+      magicLinkButton.disabled = false;
     }
   });
   signOutButton.addEventListener('click', () => void client.auth.signOut());
@@ -342,13 +355,13 @@
         clearTimeout(syncTimer);
         loginForm.hidden = false;
         signedIn.hidden = true;
-        message('Nuvem desconectada · entre com a mesma conta no celular e no PC. As tarefas deste aparelho estão preservadas.');
+        message('Nuvem desconectada · acesse a mesma conta nos dois aparelhos. As tarefas deste aparelho estão preservadas.');
       }
     }, 0);
   });
   client.auth.getUser().then(({ data, error }) => {
     if (error || !data.user) {
-      message('Nuvem desconectada · crie uma conta ou entre com o mesmo e-mail e senha nos dois aparelhos.');
+      message('Nuvem desconectada · use sua conta existente ou entre sem senha pelo link de acesso.');
       loginForm.hidden = false;
     } else if (!user) void begin(data.user);
   }).catch(() => {

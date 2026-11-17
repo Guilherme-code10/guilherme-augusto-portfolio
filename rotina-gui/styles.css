@@ -41,3 +41,9 @@ main{margin-left:230px;padding:35px;max-width:1550px}h1{font-family:Impact,'Aria
 #cloudPanel .cloud-recovery{padding:16px;margin:14px 0;border:1px solid #bbcee9;border-radius:12px;background:#fff}
 #cloudPanel .cloud-recovery form{display:grid;gap:9px;max-width:460px}
 #cloudPanel .cloud-recovery[hidden]{display:none!important}
+
+/* Acesso simplificado: link de login para quem nao lembra a senha. */
+#cloudPanel .cloud-link-login{margin-top:12px;padding:13px;border:1px solid #cbdaf3;border-radius:12px;background:#fff}
+#cloudPanel .cloud-link-login button{width:100%;min-height:44px}
+#cloudPanel .cloud-link-login .muted{margin:8px 0 0}
+#cloudPanel .cloud-link-login button:disabled{opacity:.65;cursor:wait}
