@@ -18,3 +18,12 @@ O aplicativo atual continua usando `gui-planner-v2` no `localStorage`, sem depen
 6. Testar conta nova, confirmação por e-mail, sessão existente, concorrência PC/celular, uso offline e reconexão.
 
 **Importante:** Não publicar no app a chave do Supabase do financeiro. Há tabelas financeiras sem RLS no projeto existente. O Meu Dia necessita projeto exclusivo.
+
+## Implantação realizada em 16/11/2026
+
+- Projeto Supabase exclusivo: `meu-dia-gui` (ref `lizuzulqfmstdokuvmwj`).
+- Tabela `public.meu_dia_estados` criada via migração com RLS e políticas por `auth.uid()`.
+- `cloud-config.js` usa SOMENTE a chave publicável do projeto exclusivo.
+- Biblioteca `@supabase/supabase-js` fixada na versão 2.119.0.
+- O login e os dados iniciais da conta devem ser validados em aparelhos reais após cadastro.
+- Confira em Authentication → URL Configuration: Site URL e Redirect URLs para `https://guilherme-code10.github.io/guilherme-augusto-portfolio/rotina-gui/` caso o link de confirmação de e-mail redirecione para um endereço inválido.

@@ -34,7 +34,7 @@ function fold(s){let lines=[],line='',n=0;for(const c of s){const len=new TextEn
 $('ics').onclick=()=>{const monday=shift(selected,-weekday(selected)),lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Gui//Meu Dia//PT-BR','CALSCALE:GREGORIAN','BEGIN:VTIMEZONE','TZID:America/Sao_Paulo','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:-0300','TZOFFSETTO:-0300','TZNAME:-03','END:STANDARD','END:VTIMEZONE'];for(let i=0;i<7;i++){const d=shift(monday,i);for(const e of events(d)){const end=e.end<=e.start?shift(d,1):d;lines.push('BEGIN:VEVENT','UID:'+d+'-'+e.id+'@gui-meudia.local','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z/,'Z'),'DTSTART;TZID=America/Sao_Paulo:'+d.replace(/-/g,'')+'T'+e.start.replace(':','')+'00','DTEND;TZID=America/Sao_Paulo:'+end.replace(/-/g,'')+'T'+e.end.replace(':','')+'00','SUMMARY:'+escICS(e.title),'END:VEVENT')}}lines.push('END:VCALENDAR');download('rotina-semana-'+monday+'.ics',lines.map(fold).join('\r\n')+'\r\n','text/calendar;charset=utf-8');notice('Semana exportada. Este arquivo não sincroniza alterações.')};
 window.MeuDiaCloudApp = {
   read: () => clone(state),
-  seed: () => ({schema:2, templates:clone(SEED), days:{}, quick:[]}),
+  seed: () => ({schema:2, templates:clone(SEED), days:{}}),
   replace: incoming => {
     if (!valid(incoming)) throw new Error('Estado remoto inválido');
     state = clone(incoming);

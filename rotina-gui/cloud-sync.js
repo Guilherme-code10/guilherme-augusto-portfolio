@@ -70,7 +70,7 @@
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
   });
   let user = null, revision = null, baseline = null, pending = false;
-  let changed = 0, syncTimer = null, activeRequest = false, loading = false;
+  let changed = 0, syncTimer = null, activeRequest = false, loading = false, failureCount = 0;
   let bootSequence = 0, lastOnlineCheck = 0;
 
   function message(value) { statusEl.textContent = value; }
@@ -132,6 +132,7 @@
       } else {
         revision = Number(remote.revision);
         baseline = copy(remote.payload);
+        failureCount = 0;
         const combined = sameAccount ? merge(oldBase, local, remote.payload) : remote.payload;
         if (!equal(local, combined)) preserveLocal();
         app.replace(combined);
@@ -179,6 +180,7 @@
         message('Conciliando edições feitas em outro aparelho...');
       } else {
         revision = Number(data.revision);
+        failureCount = 0;
         baseline = snapshot;
         pending = changed !== generation;
         remember();
@@ -186,10 +188,11 @@
       }
     } catch (error) {
       pending = true;
-      message('Alterações salvas no aparelho. A nuvem será tentada novamente. ' + (error.message || ''));
+      failureCount++;
+      message('Alterações salvas no aparelho. Tentaremos novamente na nuvem. ' + (error.message || ''));
     } finally {
       activeRequest = false;
-      if (pending) schedule(3200);
+      if (pending) schedule(failureCount ? Math.min(60000, 3000 * Math.pow(2, Math.min(failureCount, 5))) : 600);
     }
   }
 
@@ -198,7 +201,7 @@
     activeRequest = true;
     try {
       const remote = await remoteRow();
-      if (!remote) throw new Error('Nenhum estado remoto foi encontrado');
+      if (!remote) { activeRequest = false; void begin(user); return; }
       if (revision !== Number(remote.revision)) {
         const combined = pending ? merge(baseline || app.seed(), app.read(), remote.payload) : remote.payload;
         revision = Number(remote.revision);
@@ -247,7 +250,7 @@
       emailRedirectTo: window.location.origin + window.location.pathname,
     }});
     if (error) message('Não foi possível cadastrar: ' + error.message);
-    else if (!data.session) message('Conta criada. Confira seu e-mail para confirmar o cadastro e depois entre.');
+    else if (!data.session) message('Conta criada. Confirme pelo link recebido no e-mail, volte para esta página e entre.');
     else message('Conta criada. Conectando...');
     document.getElementById('cloudLoginPassword').value = '';
   });
