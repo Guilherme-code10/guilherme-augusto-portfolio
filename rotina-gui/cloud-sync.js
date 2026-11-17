@@ -12,6 +12,7 @@
   const signedIn = document.getElementById('cloudSignedIn');
   const emailDisplay = document.getElementById('cloudEmail');
   const signUpButton = document.getElementById('cloudSignUp');
+  const resendEmailButton = document.getElementById('cloudResendEmail');
   const signOutButton = document.getElementById('cloudSignOut');
   const retryButton = document.getElementById('cloudRetry');
   const SYNC_KEY = 'meu-dia-nuvem-v1';
@@ -235,7 +236,7 @@
     const password = document.getElementById('cloudLoginPassword').value;
     message('Entrando com segurança...');
     const { error } = await client.auth.signInWithPassword({ email, password });
-    if (error) message('Não foi possível entrar: ' + error.message);
+    if (error) message(error.message === 'Invalid login credentials' || error.message === 'Email not confirmed' ? 'Ainda não foi possível entrar. Confirme seu e-mail no Gmail e confira sua senha; se precisar, use Reenviar e-mail de confirmação.' : 'Não foi possível entrar: ' + error.message);
     document.getElementById('cloudLoginPassword').value = '';
   });
   signUpButton.addEventListener('click', async () => {
@@ -253,6 +254,26 @@
     else if (!data.session) message('Cadastro solicitado. Verifique a caixa de entrada e spam para confirmar o e-mail. Depois, volte aqui e entre.');
     else message('Conta criada. Conectando...');
     document.getElementById('cloudLoginPassword').value = '';
+  });
+  resendEmailButton.addEventListener('click', async () => {
+    const email = document.getElementById('cloudLoginEmail').value.trim();
+    if (!email) { message('Preencha o e-mail cadastrado para reenviar a confirmação.'); return; }
+    resendEmailButton.disabled = true;
+    message('Solicitando novo e-mail de confirmação...');
+    try {
+      const { error } = await client.auth.resend({
+        type: 'signup',
+        email,
+        options: { emailRedirectTo: window.location.origin + window.location.pathname },
+      });
+      message(error
+        ? 'Não foi possível reenviar: ' + error.message
+        : 'Se o cadastro estiver pendente, enviaremos outro link. Confira seu Gmail e a pasta Spam.');
+    } catch {
+      message('Não foi possível solicitar o e-mail. Confira sua conexão e tente novamente.');
+    } finally {
+      resendEmailButton.disabled = false;
+    }
   });
   signOutButton.addEventListener('click', () => void client.auth.signOut());
   retryButton.addEventListener('click', () => void (pending ? upload() : refresh()));
