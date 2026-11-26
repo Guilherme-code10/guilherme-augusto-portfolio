@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Ficha do site | RL Personalização &amp; Bordados</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap">
+<style>
+/* VOICE: amigável e direto, como um atendente de gráfica que quer entender o pedido
+   IDEA: a ficha de pedido de uma gráfica de personalização, que o cliente preenche no balcão
+   PICTURE: o próprio formulário, em uma coluna calma, com a faixa ciano/magenta/amarelo no topo
+   COLOUR and TYPE: papel claro, tinta quase preta, magenta como destaque, ciano de apoio; Space Grotesk + Inter
+   LAYOUT: uma coluna de até 720px, blocos de pergunta separados por linhas, resumo no fim */
+:root{color-scheme:light dark;
+--bg:light-dark(#F7F5F0,#131316);--panel:light-dark(#FFFDF9,#1E1E24);--ink:light-dark(#131316,#F2F0EA);
+--soft:light-dark(#4A4A55,#C3C3CC);--line:light-dark(#E2DED4,#34343C);--mag:light-dark(#B8166A,#F25AA6);
+--magbg:light-dark(#FBE3EF,#3A1A2B);--cyan:#23B5D3;--yel:#F6C531;--wa:#1F9D55}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,Arial,sans-serif;overflow-x:clip}
+.stripe{display:flex;height:10px}.stripe i{flex:1}.stripe i:nth-child(1){background:var(--cyan)}.stripe i:nth-child(2){background:#E5338C}.stripe i:nth-child(3){background:var(--yel)}
+main{max-width:720px;margin:0 auto;padding:clamp(24px,5vw,56px) 16px 64px}
+h1,h2{font-family:'Space Grotesk',Arial,sans-serif;margin:0;line-height:1.08;text-wrap:balance}
+h1{font-size:clamp(30px,6vw,44px)}
+.intro{color:var(--soft);font-size:17px;margin:14px 0 0;max-width:60ch}
+.free{display:inline-block;margin-top:18px;padding:6px 14px;border-radius:999px;background:var(--magbg);color:var(--mag);font-weight:600;font-size:15px}
+form{margin-top:32px;background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+fieldset{border:0;margin:0;padding:24px clamp(18px,4vw,32px);border-top:1px solid var(--line)}
+fieldset:first-child{border-top:0}
+legend{float:left;width:100%;padding:0;font-family:'Space Grotesk',Arial,sans-serif;font-weight:700;font-size:21px;line-height:1.2}
+.hint{clear:both;color:var(--soft);font-size:15px;margin:6px 0 0}
+.opts{clear:both;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:8px;margin-top:14px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;min-height:44px}
+.opt:has(input:checked){border-color:var(--mag);background:var(--magbg)}
+.opt input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--mag);flex:none}
+.row{clear:both;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px;margin-top:14px}
+label.f{display:block;font-weight:600;font-size:15px}
+input[type=text],input[type=tel],textarea{display:block;width:100%;margin-top:6px;font:16px Inter,Arial,sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;min-height:44px}
+textarea{min-height:96px;resize:vertical}
+.other{clear:both;margin-top:10px}
+input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible,.opt:has(input:focus-visible){outline:3px solid var(--cyan);outline-offset:2px}
+.req{color:var(--mag)}
+.foot{padding:24px clamp(18px,4vw,32px);border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+.saved{color:var(--soft);font-size:14px}
+button,.btn{font:600 16px Inter,Arial,sans-serif;border:0;border-radius:999px;padding:12px 24px;min-height:44px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.primary{background:var(--mag);color:light-dark(#FFFDF9,#131316)}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.wa{background:var(--wa);color:#fff}
+.err{color:var(--mag);font-weight:600;font-size:15px;width:100%;margin:0}
+#done{display:none;margin-top:32px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,4vw,32px)}
+#done.on{display:block}
+#done h2{font-size:28px}
+#done p{color:var(--soft);margin:10px 0 0}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px;font:14px/1.5 Inter,Arial,sans-serif;color:var(--ink);margin:18px 0 0;max-height:360px;overflow:auto}
+.acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.num{font-weight:600;color:var(--ink)}
+.by{margin-top:40px;color:var(--soft);font-size:14px;text-align:center}.by a{color:var(--mag);font-weight:600}
+@media (prefers-reduced-motion:no-preference){#done.on{animation:up .35s ease-out}@keyframes up{from{opacity:0;transform:translateY(12px)}}}
+</style>
+</head>
+<body>
+<div class="stripe" aria-hidden="true"><i></i><i></i><i></i></div>
+<main>
+<h1>Ficha do site da RL Personalização &amp; Bordados</h1>
+<p class="intro">Conte o que atrapalha hoje e o que não pode faltar. Com as respostas, eu monto uma prévia do site de vocês e envio pelo WhatsApp.</p>
+<span class="free">Gratuito, sem compromisso, uns 5 minutos</span>
+
+<form id="f" novalidate>
+<fieldset>
+<legend>Sobre vocês</legend>
+<div class="row">
+<label class="f" for="nome">Seu nome <span class="req">*</span><input type="text" id="nome" name="nome" autocomplete="name"></label>
+<label class="f" for="zap">WhatsApp para receber a prévia<input type="tel" id="zap" name="zap" autocomplete="tel" placeholder="(11) 9...."></label>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>O que mais atrapalha hoje?</legend>
+<p class="hint">Marque quantas quiser.</p>
+<div class="opts" data-group="dificuldades"></div>
+<input class="other" type="text" id="dif_outro" placeholder="Outra dificuldade" aria-label="Outra dificuldade">
+</fieldset>
+
+<fieldset>
+<legend>O que não pode faltar no site?</legend>
+<p class="hint">Marque o que for essencial para vocês.</p>
+<div class="opts" data-group="essenciais"></div>
+<input class="other" type="text" id="ess_outro" placeholder="Mais alguma coisa" aria-label="Outro item essencial">
+</fieldset>
+
+<fieldset>
+<legend>Quais produtos aparecem primeiro?</legend>
+<p class="hint">Os que vendem mais ou que vocês querem vender mais.</p>
+<div class="opts" data-group="produtos"></div>
+</fieldset>
+
+<fieldset>
+<legend>Quem mais compra de vocês?</legend>
+<div class="opts" data-group="cliente" data-type="radio"></div>
+</fieldset>
+
+<fieldset>
+<legend>Vocês já têm site ou domínio?</legend>
+<div class="opts" data-group="site" data-type="radio"></div>
+<input class="other" type="text" id="site_qual" placeholder="Se sim, qual o endereço?" aria-label="Endereço do site atual">
+</fieldset>
+
+<fieldset>
+<legend>Para quando gostariam do site?</legend>
+<div class="opts" data-group="prazo" data-type="radio"></div>
+</fieldset>
+
+<fieldset>
+<legend>Referências e recados</legend>
+<div class="row">
+<label class="f" for="ref">Um site que vocês acham bonito (opcional)<input type="text" id="ref" placeholder="Endereço ou nome da loja"></label>
+</div>
+<label class="f" for="obs" style="margin-top:14px">Algo mais que eu deva saber?<textarea id="obs"></textarea></label>
+</fieldset>
+
+<div class="foot">
+<span class="saved" id="saved">Suas respostas ficam salvas neste aparelho enquanto você preenche.</span>
+<p class="err" id="err" role="alert" hidden></p>
+<button type="submit" class="primary">Revisar e enviar</button>
+</div>
+</form>
+
+<section id="done" aria-live="polite">
+<h2>Pronto! Falta só enviar</h2>
+<p id="doneTxt"></p>
+<pre id="resumo"></pre>
+<div class="acts">
+<a class="btn wa" id="waBtn" href="#" hidden>Enviar pelo WhatsApp</a>
+<button type="button" class="ghost" id="copy">Copiar respostas</button>
+<button type="button" class="ghost" id="edit">Voltar e editar</button>
+</div>
+<p id="copyMsg" class="saved" style="margin-top:12px"></p>
+</section>
+
+<p class="by">Feito por Guilherme Augusto · WhatsApp <span class="num" id="numTxt">(11) 95062-2372</span> · <a href="./">ver portfólio</a></p>
+</main>
+
+<script>
+{
+// Troque pelo seu número com DDI e DDD, só dígitos. Ex.: 5511999998888
+const WHATS = '5511950622372';
+const NOME_DONO = 'Guilherme Augusto';
+
+const G = {
+  dificuldades: ['Clientes perguntam sempre as mesmas coisas','Difícil mostrar todo o catálogo','Poucos clientes novos fora do Instagram','Pedidos de empresas difíceis de organizar','Clientes somem depois do orçamento','Falta tempo para responder todo mundo'],
+  essenciais: ['Catálogo por categoria','Botão de orçamento no WhatsApp','Página para empresas','Galeria de trabalhos feitos','Endereço, mapa e horário da loja','Preços a partir de','Quantidade mínima por produto','Prazo de produção','Envio da arte ou logo pelo site','Perguntas frequentes'],
+  produtos: ['Canecas','Camisetas','Moletons','Bonés','Jalecos e uniformes bordados','Aventais','Toalhas e tapetes','Mousepads','Brindes para empresas','Lembrancinhas de festa'],
+  cliente: ['Pessoas, para presente ou festa','Empresas','Os dois, meio a meio'],
+  site: ['Não temos','Sim, temos','Não sei'],
+  prazo: ['O quanto antes','Em até 1 mês','Sem pressa']
+};
+const LBL = {dificuldades:'O que atrapalha hoje',essenciais:'Não pode faltar',produtos:'Produtos em destaque',cliente:'Quem mais compra',site:'Já tem site',prazo:'Prazo'};
+
+for (const box of document.querySelectorAll('.opts')) {
+  const g = box.dataset.group, t = box.dataset.type || 'checkbox';
+  box.innerHTML = G[g].map((o,i) =>
+    `<label class="opt"><input type="${t}" name="${g}" id="${g}${i}" value="${i}"><span></span></label>`).join('');
+  box.querySelectorAll('.opt span').forEach((s,i) => s.textContent = G[g][i]);
+}
+
+const f = document.getElementById('f');
+const KEY = 'ficha-rl-v1';
+const val = id => document.getElementById(id).value.trim();
+const picked = g => [...f.querySelectorAll(`input[name="${g}"]:checked`)].map(i => G[g][+i.value]);
+
+function snapshot(){
+  const d = {};
+  f.querySelectorAll('input[type=text],input[type=tel],textarea').forEach(e => d[e.id] = e.value);
+  f.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(e => d[e.id] = e.checked);
+  return d;
+}
+function restore(){
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (!d) return;
+    for (const [k,v] of Object.entries(d)) { const e = document.getElementById(k); if (!e) continue; if (typeof v === 'boolean') e.checked = v; else e.value = v; }
+  } catch(e) {}
+}
+f.addEventListener('input', () => { try { localStorage.setItem(KEY, JSON.stringify(snapshot())); } catch(e) {} });
+restore();
+
+function resumo(){
+  const L = [`*Ficha do site — RL Personalização & Bordados*`, `Respondido por: ${val('nome')}`];
+  if (val('zap')) L.push(`WhatsApp: ${val('zap')}`);
+  for (const g of Object.keys(G)) {
+    let items = picked(g);
+    if (g === 'dificuldades' && val('dif_outro')) items.push(val('dif_outro'));
+    if (g === 'essenciais' && val('ess_outro')) items.push(val('ess_outro'));
+    if (g === 'site' && val('site_qual')) items.push(`Endereço: ${val('site_qual')}`);
+    L.push('', `*${LBL[g]}:*`, items.length ? items.map(x => `• ${x}`).join('\n') : '• (não respondido)');
+  }
+  if (val('ref')) L.push('', `*Referência:* ${val('ref')}`);
+  if (val('obs')) L.push('', `*Recado:* ${val('obs')}`);
+  return L.join('\n');
+}
+
+const done = document.getElementById('done'), err = document.getElementById('err');
+const wa = document.getElementById('waBtn'), digits = WHATS.replace(/\D/g,'');
+
+
+f.addEventListener('submit', e => {
+  e.preventDefault();
+  if (!val('nome')) { err.textContent = 'Coloque seu nome para eu saber quem respondeu.'; err.hidden = false; document.getElementById('nome').focus(); return; }
+  err.hidden = true;
+  const txt = resumo();
+  document.getElementById('resumo').textContent = txt;
+  if (digits) {
+    wa.href = `https://wa.me/${digits}?text=${encodeURIComponent(txt)}`; wa.hidden = false;
+    document.getElementById('doneTxt').textContent = 'Toque em “Enviar pelo WhatsApp”: a mensagem abre pronta, é só mandar. Depois eu monto a prévia do site e envio para vocês.';
+  } else {
+    wa.hidden = true;
+    document.getElementById('doneTxt').textContent = `Copie as respostas e envie para ${NOME_DONO} pelo WhatsApp. Depois eu monto a prévia do site e envio para vocês.`;
+  }
+  f.style.display = 'none'; done.classList.add('on'); done.scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+document.getElementById('edit').addEventListener('click', () => { done.classList.remove('on'); f.style.display = ''; f.scrollIntoView({block:'start'}); });
+document.getElementById('copy').addEventListener('click', async () => {
+  const m = document.getElementById('copyMsg');
+  try { await navigator.clipboard.writeText(document.getElementById('resumo').textContent); m.textContent = 'Respostas copiadas.'; }
+  catch(e) { m.textContent = 'Não deu para copiar automaticamente. Selecione o texto acima e copie.'; }
+});
+}
+</script>
+</body>
+</html>
